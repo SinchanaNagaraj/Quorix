@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health
+from app.api.routes import health, query
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -15,3 +15,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(health.router, prefix=settings.api_prefix)
+app.include_router(query.router, prefix=settings.api_prefix)

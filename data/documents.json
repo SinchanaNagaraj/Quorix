@@ -1,0 +1,217 @@
+[
+  {
+    "doc_id": "DOC-001",
+    "title": "Project Atlas Overview and Glossary",
+    "ext": "md",
+    "version": "1.2",
+    "status": "approved",
+    "owner": "Vikram Shah",
+    "created_at": "2024-01-15T09:00:00Z",
+    "last_updated": "2025-01-10T11:30:00Z",
+    "tags": [
+      "overview",
+      "glossary",
+      "team"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Vikram Shah",
+    "authority_level": "high",
+    "content": "# Project Atlas Overview and Glossary\n\n## Purpose\nAtlas is an order and catalog management platform for mid-size retailers. It exposes a REST API that lets retailers publish product catalogs, accept orders, and search products. The pilot launched in April 2024 and general availability followed in September 2024.\n\n## Services\n- **api-gateway**: authentication check, rate limiting, request routing.\n- **catalog-service**: product catalog reads and writes.\n- **order-service**: order creation and order status.\n- **auth-service**: issues and refreshes tokens.\n- **search-service**: product search backed by OpenSearch.\n- **notification-worker**: consumes order events and sends emails/webhooks.\n\n## Technology Summary\nPython 3.11 with FastAPI, PostgreSQL, Redis, RabbitMQ, OpenSearch, running on Kubernetes (AWS EKS). The engineering team has six engineers and one engineering manager.\n\n## Glossary\n- **TTL**: time to live, the number of seconds a cached value is kept before it expires.\n- **p95 latency**: the response time under which 95 percent of requests complete.\n- **ADR**: architecture decision record, a short document capturing a design decision and its rationale.\n- **Blue-green deployment**: running two production environments and switching traffic between them.\n- **Expand/contract migration**: a database change pattern that keeps old and new application versions compatible.\n",
+    "file": "documents/DOC-001_project_atlas_overview_and_glossary.md"
+  },
+  {
+    "doc_id": "DOC-002",
+    "title": "Atlas System Architecture",
+    "ext": "md",
+    "version": "3.0",
+    "status": "approved",
+    "owner": "Aarav Mehta",
+    "created_at": "2024-02-01T10:00:00Z",
+    "last_updated": "2024-12-05T14:20:00Z",
+    "tags": [
+      "architecture",
+      "components",
+      "data-flow"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Aarav Mehta",
+    "authority_level": "high",
+    "content": "# Atlas System Architecture (v3.0)\n\n## Overview\nClient requests enter through the **api-gateway**, which verifies JWT signatures using the auth-service public key (RS256) and applies per-key rate limiting. Requests are then routed to catalog-service, order-service, or search-service.\n\n## Data Stores\n- **PostgreSQL 16** on Amazon RDS: one primary and one read replica. It is the source of truth for products, orders, and customers.\n- **Redis 7** on Amazon ElastiCache: a cache-aside layer for catalog reads and the session store. Caching details are described in the Caching Architecture document.\n- **OpenSearch 2.11**: product search index, updated incrementally from catalog events.\n\n## Messaging\nOrder and catalog events are published to RabbitMQ 3.12 (Amazon MQ). Events include `order.created` and `catalog.updated`. The messaging technology choice is recorded in ADR-003.\n\n## Deployment\nServices run as containers on AWS EKS and are released using blue-green deployments (see the Deployment and Rollback Runbook).\n\n## Data Flow: Catalog Read\n1. Gateway authenticates the request and checks the rate limit.\n2. catalog-service checks Redis for `catalog:product:{id}`.\n3. On a miss, it reads from PostgreSQL and writes the result back to Redis.\n",
+    "file": "documents/DOC-002_atlas_system_architecture.md"
+  },
+  {
+    "doc_id": "DOC-003",
+    "title": "Atlas Caching Architecture",
+    "ext": "md",
+    "version": "1.0",
+    "status": "approved",
+    "owner": "Priya Nair",
+    "created_at": "2024-04-10T09:30:00Z",
+    "last_updated": "2024-04-10T09:30:00Z",
+    "tags": [
+      "caching",
+      "redis",
+      "ttl"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Priya Nair",
+    "authority_level": "high",
+    "content": "# Atlas Caching Architecture (v1.0)\n\n## Pattern\nThe catalog read path uses a **cache-aside** pattern with Redis. catalog-service reads from Redis first and falls back to PostgreSQL on a miss.\n\n## Key Format\nProduct entries use the key `catalog:product:{id}`.\n\n## TTL Policy\n- Catalog product entries: **300 seconds**.\n- Session entries: **1800 seconds**.\n\n## Invalidation\nEntries are invalidated by **TTL expiry only**. There is no explicit invalidation when a product is updated.\n\n## Capacity and Eviction\nThe Redis node is configured with **1 GB** of max memory and the `allkeys-lru` eviction policy.\n\n## Targets\nTarget cache hit ratio for catalog reads is 80 percent. Target p95 latency for `GET /v2/products` is below 250 ms.\n",
+    "file": "documents/DOC-003_atlas_caching_architecture.md"
+  },
+  {
+    "doc_id": "DOC-004",
+    "title": "Security and Authentication Guidelines",
+    "ext": "md",
+    "version": "2.1",
+    "status": "approved",
+    "owner": "Meera Krishnan",
+    "created_at": "2024-03-20T09:00:00Z",
+    "last_updated": "2025-01-20T16:00:00Z",
+    "tags": [
+      "security",
+      "jwt",
+      "authentication"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Meera Krishnan",
+    "authority_level": "high",
+    "content": "# Security and Authentication Guidelines (v2.1)\n\n## Token Standard\nAtlas uses JSON Web Tokens signed with **RS256**. The auth-service holds the private key. The gateway and all other services verify tokens with the public key only.\n\n## Token Lifetimes\n- **Access token: 15 minutes.**\n- **Refresh token: 7 days**, with rotation on every use and reuse detection. If a rotated refresh token is presented again, the whole token family is revoked.\n\n## Key Management\nSigning keys are stored in AWS Secrets Manager and **rotated every 90 days**. Services must never log token contents.\n\n## Passwords and Secrets\nPasswords are hashed with bcrypt (cost factor 12). Secrets must not be committed to source control.\n\n## Transport and Data Protection\nAll inter-service traffic uses TLS. Personally identifiable information columns are encrypted at rest.\n",
+    "file": "documents/DOC-004_security_and_authentication_guidelines.md"
+  },
+  {
+    "doc_id": "DOC-005",
+    "title": "Atlas Public API Specification",
+    "ext": "md",
+    "version": "2.3",
+    "status": "approved",
+    "owner": "Aarav Mehta",
+    "created_at": "2024-04-02T10:00:00Z",
+    "last_updated": "2025-02-14T12:00:00Z",
+    "tags": [
+      "api",
+      "rest",
+      "rate-limit",
+      "bulk-import"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Aarav Mehta",
+    "authority_level": "high",
+    "content": "# Atlas Public API Specification (v2.3)\n\n## Style\nThe Atlas API is **REST over JSON**. Base path: `/v2`. There is no GraphQL interface.\n\n## Endpoints\n- `GET /v2/products` and `GET /v2/products/{id}`\n- `POST /v2/orders` and `GET /v2/orders/{id}`\n- `POST /v2/products/bulk`: bulk product import, **maximum 500 items per request**.\n\n## Authentication\nSend either `Authorization: Bearer <JWT>` or the `X-Atlas-Key` header.\n\n## Rate Limiting\nEach API key is limited to **100 requests per minute**, with a burst allowance of 20 additional requests. Exceeding the limit returns HTTP 429 with a `Retry-After` header.\n\n## Pagination\nCursor-based. Default page size 50, maximum 200.\n\n## Data Freshness\nCatalog responses may be up to 10 minutes behind the system of record because of caching.\n\n## Errors\nErrors use a JSON body with `code`, `message`, and `request_id`.\n",
+    "file": "documents/DOC-005_atlas_public_api_specification.md"
+  },
+  {
+    "doc_id": "DOC-006",
+    "title": "Engineering Guidelines",
+    "ext": "txt",
+    "version": "1.4",
+    "status": "approved",
+    "owner": "Vikram Shah",
+    "created_at": "2024-02-10T09:00:00Z",
+    "last_updated": "2024-09-02T10:15:00Z",
+    "tags": [
+      "guidelines",
+      "code-review",
+      "process"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Vikram Shah",
+    "authority_level": "high",
+    "content": "ENGINEERING GUIDELINES (v1.4)\n\n## Branching\nTrunk-based development with short-lived branches named feature/ATL-<id>-<slug>. Hotfix branches use hotfix/ATL-<id>-<slug>.\n\n## Pull Requests\nEvery pull request requires 2 approvals before merge. (Version 1.3 required 1 approval; this was raised after the August 2024 outage.) CI must pass. New code must have at least 80 percent unit test coverage.\n\n## Commits\nUse conventional commit messages, for example fix(catalog): correct TTL handling.\n\n## Database Migrations\nAll migrations must follow the expand/contract pattern so that the previous application version keeps working while a rollout is in progress. Destructive changes (dropping or renaming columns) must be split across two releases.\n\n## Tooling\nPython 3.11, ruff for linting, black for formatting.\n\n## Releases\nNo production deployments on Fridays except approved hotfixes.\n",
+    "file": "documents/DOC-006_engineering_guidelines.txt"
+  },
+  {
+    "doc_id": "DOC-007",
+    "title": "Atlas Configuration Reference",
+    "ext": "md",
+    "version": "4.2",
+    "status": "approved",
+    "owner": "Rohan Iyer",
+    "created_at": "2024-03-15T09:00:00Z",
+    "last_updated": "2025-02-18T09:45:00Z",
+    "tags": [
+      "configuration",
+      "settings",
+      "ttl",
+      "rate-limit",
+      "pool"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Rohan Iyer",
+    "authority_level": "high",
+    "content": "# Atlas Configuration Reference (v4.2)\n\nValues below describe the production defaults.\n\n## Caching\n| Setting | Value |\n| --- | --- |\n| CATALOG_CACHE_TTL_SECONDS | 600 |\n| SESSION_TTL_SECONDS | 1800 |\n| REDIS_MAX_MEMORY | 2gb |\n| REDIS_EVICTION_POLICY | allkeys-lru |\n\n## Database\n| Setting | Value |\n| --- | --- |\n| DB_POOL_MAX | 40 (per service instance) |\n| DB_POOL_TIMEOUT_SECONDS | 30 |\n\n## Gateway\n| Setting | Value |\n| --- | --- |\n| RATE_LIMIT_PER_MIN | 120 |\n| RATE_LIMIT_BURST | 20 |\n| REQUEST_TIMEOUT_SECONDS | 10 |\n\n## Authentication\n| Setting | Value |\n| --- | --- |\n| JWT_ACCESS_TTL_MIN | 15 |\n| JWT_REFRESH_TTL_DAYS | 7 |\n\n## Messaging and Search\n| Setting | Value |\n| --- | --- |\n| RABBITMQ_PREFETCH | 20 |\n| SEARCH_BULK_BATCH | 200 |\n",
+    "file": "documents/DOC-007_atlas_configuration_reference.md"
+  },
+  {
+    "doc_id": "DOC-008",
+    "title": "Deployment and Rollback Runbook",
+    "ext": "md",
+    "version": "2.0",
+    "status": "approved",
+    "owner": "Rohan Iyer",
+    "created_at": "2024-09-10T09:00:00Z",
+    "last_updated": "2024-11-12T13:00:00Z",
+    "tags": [
+      "deployment",
+      "rollback",
+      "blue-green",
+      "runbook"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Rohan Iyer",
+    "authority_level": "high",
+    "content": "# Deployment and Rollback Runbook (v2.0)\n\n## Strategy\nAtlas uses **blue-green deployments** on EKS. The new version is deployed to the idle environment, verified, and then traffic is switched at the load balancer. Rolling updates are no longer used for production.\n\n## Release Steps\n1. Deploy the new version to the idle (green) environment.\n2. Run the automated smoke test suite.\n3. Switch 100 percent of traffic to green.\n4. Monitor error rate and p95 latency for 15 minutes.\n\n## Rollback\nTo roll back, switch traffic back to the previous (blue) environment. The target time to complete a rollback is **under 5 minutes**. The previous environment is kept running for **60 minutes** after cutover so that it is available for rollback.\n\n## Database Changes\nMigrations must be backward compatible (expand/contract) because the old and new versions share one database.\n\n## Windows and Approvals\nDeployments are allowed Monday to Thursday. Friday deployments are only for approved hotfixes. A release manager must approve each production cutover.\n",
+    "file": "documents/DOC-008_deployment_and_rollback_runbook.md"
+  },
+  {
+    "doc_id": "DOC-009",
+    "title": "Observability and Incident Response Guide",
+    "ext": "txt",
+    "version": "1.1",
+    "status": "draft",
+    "owner": "Rohan Iyer",
+    "created_at": "2024-09-25T09:00:00Z",
+    "last_updated": "2024-10-08T15:00:00Z",
+    "tags": [
+      "observability",
+      "alerts",
+      "incident"
+    ],
+    "source_type": "document",
+    "authority_score": 0.5,
+    "authority_basis": "Document status 'draft' owned by Rohan Iyer",
+    "authority_level": "medium",
+    "content": "OBSERVABILITY AND INCIDENT RESPONSE GUIDE (v1.1, DRAFT)\n\n## Tooling\nMetrics are collected with Prometheus and visualised in Grafana. Logs are shipped to a central log store.\n\n## Alert Thresholds\n- API p95 latency above 500 ms for 5 minutes: warning to the engineering channel.\n- Error rate above 2 percent for 3 minutes: page the on-call engineer.\n- Database CPU above 80 percent for 10 minutes: warning.\n\n## Severity Levels\n- SEV1: customer-facing outage.\n- SEV2: major degradation.\n- SEV3: minor issue with a workaround.\n\n## Postmortems\nA written postmortem is required within 5 business days for any SEV1 or SEV2 incident.\n\n## Status\nThis guide is a draft pending review by the engineering manager.\n",
+    "file": "documents/DOC-009_observability_and_incident_response_guide.txt"
+  },
+  {
+    "doc_id": "DOC-010",
+    "title": "Database Schema and Migration Guide",
+    "ext": "md",
+    "version": "2.0",
+    "status": "approved",
+    "owner": "Priya Nair",
+    "created_at": "2024-03-01T09:00:00Z",
+    "last_updated": "2024-10-28T10:00:00Z",
+    "tags": [
+      "database",
+      "postgresql",
+      "migrations",
+      "backup"
+    ],
+    "source_type": "document",
+    "authority_score": 0.9,
+    "authority_basis": "Document status 'approved' owned by Priya Nair",
+    "authority_level": "high",
+    "content": "# Database Schema and Migration Guide (v2.0)\n\n## Engine\nAtlas runs **PostgreSQL 16** on Amazon RDS. The database was upgraded from PostgreSQL 14 in October 2024.\n\n## Core Tables\n`products`, `orders`, `order_items`, `customers`, `api_keys`.\n\n## Migrations\nSchema changes are managed with Alembic and follow the expand/contract pattern: add new structures first, migrate data, and remove old structures in a later release.\n\n## Connection Pooling\nEach service instance maintains an application-level pool of up to **40** connections.\n\n## Read Replica\nOne read replica serves reporting queries. Transactional reads and writes use the primary.\n\n## Backups\nAutomated daily snapshots are retained for 30 days. Point-in-time recovery is available for the last 7 days.\n",
+    "file": "documents/DOC-010_database_schema_and_migration_guide.md"
+  }
+]

@@ -1,0 +1,448 @@
+{
+  "dataset": "Project Atlas",
+  "as_of": "2025-03-31T00:00:00Z",
+  "default_budget": {
+    "max_source_calls": 3,
+    "max_chunks": 10,
+    "max_context_tokens": 4000
+  },
+  "questions": [
+    {
+      "question_id": "Q01",
+      "question": "What are the access token and refresh token lifetimes?",
+      "scenarios": [
+        1,
+        8
+      ],
+      "ideal_source_types": [
+        "documents"
+      ],
+      "gold_record_ids": [
+        "DOC-004",
+        "DOC-007"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Access token 15 minutes; refresh token 7 days (with rotation).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q02",
+      "question": "How many approvals does a pull request need before merging?",
+      "scenarios": [
+        1,
+        8
+      ],
+      "ideal_source_types": [
+        "documents"
+      ],
+      "gold_record_ids": [
+        "DOC-006"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Two approvals (raised from one after the August 2024 outage).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q03",
+      "question": "Why did the team choose RabbitMQ over Kafka?",
+      "scenarios": [
+        2
+      ],
+      "ideal_source_types": [
+        "conversations"
+      ],
+      "gold_record_ids": [
+        "CONV-003"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Small team, managed Amazon MQ, about 1,500 msg/s peak fits RabbitMQ, no need for replay; revisit Kafka beyond ~20k msg/s (ADR-003).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q04",
+      "question": "Why was JWT signing changed from HS256 to RS256?",
+      "scenarios": [
+        2
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "CONV-006",
+        "ATL-076"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "HS256 shared one secret across four services; RS256 means only the public key is distributed. Access token cut from 60 to 15 minutes.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q05",
+      "question": "Why was PostgreSQL upgraded to version 16?",
+      "scenarios": [
+        2
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "CONV-007",
+        "ATL-098"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Better parallel query and logical replication; staging reporting queries about 12% faster; done in Oct 2024 window.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q06",
+      "question": "Why was Redis caching introduced, and what is its current catalog TTL configuration?",
+      "scenarios": [
+        3
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "tickets",
+        "documents"
+      ],
+      "gold_record_ids": [
+        "CONV-001",
+        "ATL-045",
+        "ATL-141",
+        "DOC-007"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Introduced to cut catalog p95 latency (850ms) and Postgres CPU (85%). Current catalog TTL is 600 seconds (raised from 300 in June 2024).",
+      "expected_conflict": null,
+      "notes": "DOC-003 still says 300s and is outdated."
+    },
+    {
+      "question_id": "Q07",
+      "question": "What is the catalog cache TTL?",
+      "scenarios": [
+        5
+      ],
+      "ideal_source_types": [
+        "documents",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-007",
+        "ATL-141"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "600 seconds. DOC-003 (300s) is superseded by ATL-141 (June 2024) and DOC-007 (Feb 2025).",
+      "expected_conflict": "resolved_by_timestamp",
+      "notes": "Stale DOC-003 must be flagged, not used."
+    },
+    {
+      "question_id": "Q08",
+      "question": "What is the API rate limit per key?",
+      "scenarios": [
+        4
+      ],
+      "ideal_source_types": [
+        "documents",
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-005",
+        "DOC-007",
+        "CONV-012",
+        "ATL-166"
+      ],
+      "expected_decision": "conflicting",
+      "expected_answer": "Unresolved: spec says 100 req/min, gateway config says 120. Open ticket ATL-166. System should report the conflict and not pick one.",
+      "expected_conflict": "unresolved",
+      "notes": ""
+    },
+    {
+      "question_id": "Q09",
+      "question": "What is the current p95 latency alert threshold?",
+      "scenarios": [
+        5
+      ],
+      "ideal_source_types": [
+        "tickets",
+        "conversations",
+        "documents"
+      ],
+      "gold_record_ids": [
+        "ATL-149",
+        "CONV-011",
+        "DOC-009"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "400 ms since December 2024. DOC-009 (draft, 500ms) is outdated.",
+      "expected_conflict": "resolved_by_timestamp",
+      "notes": ""
+    },
+    {
+      "question_id": "Q10",
+      "question": "Which PostgreSQL version does Atlas run in production?",
+      "scenarios": [
+        5
+      ],
+      "ideal_source_types": [
+        "documents",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-002",
+        "DOC-010",
+        "ATL-098",
+        "ATL-021"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "PostgreSQL 16 (upgraded from 14 in October 2024). ATL-021 is historical.",
+      "expected_conflict": "resolved_by_timestamp",
+      "notes": ""
+    },
+    {
+      "question_id": "Q11",
+      "question": "What caused the August 2024 outage and what changed afterwards?",
+      "scenarios": [
+        2,
+        3
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "tickets",
+        "documents"
+      ],
+      "gold_record_ids": [
+        "CONV-010",
+        "ATL-125",
+        "ATL-129",
+        "DOC-006",
+        "DOC-008"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Non-backward-compatible column rename during rolling deploy (12 min of 5xx on 2024-08-22). Changes: blue-green deploys, expand/contract migrations, 2 PR approvals.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q12",
+      "question": "How do we roll back a failed deployment, and why do we deploy this way?",
+      "scenarios": [
+        3
+      ],
+      "ideal_source_types": [
+        "documents",
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-008",
+        "CONV-010",
+        "ATL-129"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Switch traffic back to the previous (blue) environment, target under 5 minutes, kept 60 minutes after cutover. Blue-green adopted after the August 2024 rolling-deploy outage.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q13",
+      "question": "How is stale cached pricing handled after a catalog update?",
+      "scenarios": [
+        2,
+        3
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "CONV-008",
+        "ATL-152",
+        "DOC-007"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "catalog.updated events trigger deletion of affected Redis keys; TTL of 600s is a fallback.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q14",
+      "question": "What is the maximum number of items in a bulk product import request?",
+      "scenarios": [
+        1,
+        8
+      ],
+      "ideal_source_types": [
+        "documents",
+        "conversations"
+      ],
+      "gold_record_ids": [
+        "DOC-005",
+        "CONV-015"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "500 items per request (1,000 caused timeouts).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q15",
+      "question": "What is the database connection pool size per service instance and why was it increased?",
+      "scenarios": [
+        3
+      ],
+      "ideal_source_types": [
+        "documents",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-007",
+        "DOC-010",
+        "ATL-110"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "40 per instance, raised from 20 to fix pool exhaustion at peak load (ATL-110).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q16",
+      "question": "What is the RTO for a multi-region failover?",
+      "scenarios": [
+        6
+      ],
+      "ideal_source_types": [],
+      "gold_record_ids": [],
+      "expected_decision": "insufficient",
+      "expected_answer": "No evidence in the dataset. System must abstain.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q17",
+      "question": "Which payment provider does Atlas use for refunds?",
+      "scenarios": [
+        6
+      ],
+      "ideal_source_types": [],
+      "gold_record_ids": [],
+      "expected_decision": "insufficient",
+      "expected_answer": "No evidence in the dataset. System must abstain.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q18",
+      "question": "What is the maximum payload size in MB for the bulk import endpoint?",
+      "scenarios": [
+        6
+      ],
+      "ideal_source_types": [
+        "documents",
+        "conversations"
+      ],
+      "gold_record_ids": [
+        "DOC-005",
+        "CONV-015"
+      ],
+      "expected_decision": "insufficient",
+      "expected_answer": "Only the item limit (500) is documented. Payload size is not recorded. System must say so rather than infer.",
+      "expected_conflict": null,
+      "notes": "Near-miss abstention test."
+    },
+    {
+      "question_id": "Q19",
+      "question": "Does Atlas offer a GraphQL API?",
+      "scenarios": [
+        1
+      ],
+      "ideal_source_types": [
+        "documents",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-005",
+        "ATL-103"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "No. Atlas v2 is REST only; a GraphQL request (ATL-103) was closed as won't do.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q20",
+      "question": "Give a full history of the changes to caching, authentication, deployment and the database since the project began, with the reason for each.",
+      "scenarios": [
+        7
+      ],
+      "ideal_source_types": [
+        "documents",
+        "conversations",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "CONV-001",
+        "CONV-005",
+        "CONV-006",
+        "CONV-007",
+        "CONV-008",
+        "CONV-010",
+        "ATL-045",
+        "ATL-141",
+        "ATL-076",
+        "ATL-098",
+        "ATL-129",
+        "ATL-152"
+      ],
+      "expected_decision": "budget_limited",
+      "expected_answer": "Needs 12+ records across all three sources, beyond the default budget (3 calls, 10 chunks). System should answer partially, respect the budget and state what remains uncovered.",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q21",
+      "question": "Was the session TTL ever changed?",
+      "scenarios": [
+        2
+      ],
+      "ideal_source_types": [
+        "conversations",
+        "documents"
+      ],
+      "gold_record_ids": [
+        "CONV-014",
+        "DOC-007",
+        "DOC-003"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "No. It stays at 1800 seconds. A rise to 3600 was discussed and parked (CONV-014).",
+      "expected_conflict": null,
+      "notes": ""
+    },
+    {
+      "question_id": "Q22",
+      "question": "How often are JWT signing keys rotated?",
+      "scenarios": [
+        1,
+        8
+      ],
+      "ideal_source_types": [
+        "documents",
+        "tickets"
+      ],
+      "gold_record_ids": [
+        "DOC-004",
+        "ATL-076"
+      ],
+      "expected_decision": "sufficient",
+      "expected_answer": "Every 90 days.",
+      "expected_conflict": null,
+      "notes": ""
+    }
+  ]
+}

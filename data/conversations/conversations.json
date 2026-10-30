@@ -1,0 +1,777 @@
+[
+  {
+    "conversation_id": "CONV-001",
+    "channel": "#backend-design",
+    "title": "Catalog latency and Redis caching proposal",
+    "participants": [
+      "Aarav Mehta",
+      "Priya Nair",
+      "Karthik Rao"
+    ],
+    "started_at": "2024-03-04T09:12:00Z",
+    "last_message_at": "2024-03-04T09:41:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-045",
+    "topics": [
+      "redis",
+      "caching",
+      "latency",
+      "catalog"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-001-M01",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-03-04T09:12:00Z",
+        "text": "Load test results are in. GET /v2/products p95 is 850ms at 200 rps and Postgres CPU is sitting at 85%. We cannot onboard FreshMart's catalog at this rate."
+      },
+      {
+        "message_id": "CONV-001-M02",
+        "author": "Priya Nair",
+        "timestamp": "2024-03-04T09:20:00Z",
+        "text": "Most of that traffic is repeat reads of the same few thousand products. I propose a Redis cache-aside layer in front of the catalog read path. ElastiCache Redis 7.0, one key per product."
+      },
+      {
+        "message_id": "CONV-001-M03",
+        "author": "Karthik Rao",
+        "timestamp": "2024-03-04T09:31:00Z",
+        "text": "What TTL are we using? The retailer ERP sync only runs hourly so staleness is not a big concern, but I do not want to serve wrong prices."
+      },
+      {
+        "message_id": "CONV-001-M04",
+        "author": "Priya Nair",
+        "timestamp": "2024-03-04T09:36:00Z",
+        "text": "Starting conservative at 300 seconds. We can tune it once we see the real hit ratio."
+      },
+      {
+        "message_id": "CONV-001-M05",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-03-04T09:41:00Z",
+        "text": "Agreed. Decision: introduce Redis cache-aside for catalog reads with a 300s TTL. Priya owns the ticket (ATL-045)."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-002",
+    "channel": "#general",
+    "title": "Pilot customer onboarding checklist",
+    "participants": [
+      "Vikram Shah",
+      "Sneha Patil"
+    ],
+    "started_at": "2024-02-05T10:00:00Z",
+    "last_message_at": "2024-02-05T10:15:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "onboarding",
+      "pilot",
+      "demo"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-002-M01",
+        "author": "Vikram Shah",
+        "timestamp": "2024-02-05T10:00:00Z",
+        "text": "Reminder: FreshMart kickoff call is Thursday at 3pm. Can someone update the onboarding checklist?"
+      },
+      {
+        "message_id": "CONV-002-M02",
+        "author": "Sneha Patil",
+        "timestamp": "2024-02-05T10:07:00Z",
+        "text": "On it. I also changed the demo dashboard accent colour to teal, the old blue looked washed out on the projector."
+      },
+      {
+        "message_id": "CONV-002-M03",
+        "author": "Vikram Shah",
+        "timestamp": "2024-02-05T10:09:00Z",
+        "text": "Teal is fine. Please add a slide with the pilot timeline, and book the small meeting room."
+      },
+      {
+        "message_id": "CONV-002-M04",
+        "author": "Sneha Patil",
+        "timestamp": "2024-02-05T10:15:00Z",
+        "text": "Done. Checklist is in the shared drive and the room is booked until 4pm."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-003",
+    "channel": "#backend-design",
+    "title": "Kafka vs RabbitMQ for order events",
+    "participants": [
+      "Karthik Rao",
+      "Rohan Iyer",
+      "Priya Nair",
+      "Aarav Mehta"
+    ],
+    "started_at": "2024-02-12T11:00:00Z",
+    "last_message_at": "2024-02-12T11:30:00Z",
+    "verified_decision": true,
+    "decision_reference": "ADR-003",
+    "topics": [
+      "rabbitmq",
+      "kafka",
+      "messaging",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-003-M01",
+        "author": "Karthik Rao",
+        "timestamp": "2024-02-12T11:00:00Z",
+        "text": "For order events, Kafka or RabbitMQ? Kafka feels like the serious choice."
+      },
+      {
+        "message_id": "CONV-003-M02",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-02-12T11:06:00Z",
+        "text": "Operationally Kafka means running a cluster and planning partitions. With six engineers I would rather not own that. Amazon MQ gives us managed RabbitMQ."
+      },
+      {
+        "message_id": "CONV-003-M03",
+        "author": "Priya Nair",
+        "timestamp": "2024-02-12T11:12:00Z",
+        "text": "Forecast peak at GA is about 1,500 messages per second. RabbitMQ handles that comfortably."
+      },
+      {
+        "message_id": "CONV-003-M04",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-02-12T11:18:00Z",
+        "text": "Do we need event replay or long retention?"
+      },
+      {
+        "message_id": "CONV-003-M05",
+        "author": "Karthik Rao",
+        "timestamp": "2024-02-12T11:21:00Z",
+        "text": "Not for the order flow. Orders are stored in Postgres as the source of truth, events are only notifications."
+      },
+      {
+        "message_id": "CONV-003-M06",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-02-12T11:30:00Z",
+        "text": "Decision: RabbitMQ (Amazon MQ) for order and catalog events. Recording this as ADR-003. We revisit Kafka if sustained volume goes past roughly 20k messages per second or we need replayable streams."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-004",
+    "channel": "#backend",
+    "title": "Redis memory usage alert",
+    "participants": [
+      "Rohan Iyer",
+      "Priya Nair"
+    ],
+    "started_at": "2024-04-22T08:40:00Z",
+    "last_message_at": "2024-04-22T09:05:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "redis",
+      "memory",
+      "capacity"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-004-M01",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-04-22T08:40:00Z",
+        "text": "Redis memory is at 78% of the 1GB node and evictions are starting."
+      },
+      {
+        "message_id": "CONV-004-M02",
+        "author": "Priya Nair",
+        "timestamp": "2024-04-22T08:47:00Z",
+        "text": "Expected with more hot catalog keys. Let us resize to 2GB and keep allkeys-lru."
+      },
+      {
+        "message_id": "CONV-004-M03",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-04-22T09:05:00Z",
+        "text": "Resized in ElastiCache with no downtime. Memory usage is now about 39%."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-005",
+    "channel": "#backend",
+    "title": "Raise catalog cache TTL to 600s?",
+    "participants": [
+      "Priya Nair",
+      "Aarav Mehta",
+      "Karthik Rao",
+      "Vikram Shah"
+    ],
+    "started_at": "2024-06-12T14:00:00Z",
+    "last_message_at": "2024-06-12T14:22:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-141",
+    "topics": [
+      "redis",
+      "ttl",
+      "caching",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-005-M01",
+        "author": "Priya Nair",
+        "timestamp": "2024-06-12T14:00:00Z",
+        "text": "Catalog cache hit ratio is only 62% with the 300s TTL. Target was 85%. Products rarely change between hourly syncs, so I propose raising the TTL to 600s."
+      },
+      {
+        "message_id": "CONV-005-M02",
+        "author": "Karthik Rao",
+        "timestamp": "2024-06-12T14:08:00Z",
+        "text": "My worry is customers seeing a stale price for up to 10 minutes."
+      },
+      {
+        "message_id": "CONV-005-M03",
+        "author": "Vikram Shah",
+        "timestamp": "2024-06-12T14:15:00Z",
+        "text": "I checked with the pilot customers. Up to 10 minutes of price staleness is acceptable to them."
+      },
+      {
+        "message_id": "CONV-005-M04",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-06-12T14:20:00Z",
+        "text": "Decision: raise CATALOG_CACHE_TTL from 300s to 600s. Priya, please raise the ticket (ATL-141) and update the docs."
+      },
+      {
+        "message_id": "CONV-005-M05",
+        "author": "Priya Nair",
+        "timestamp": "2024-06-12T14:22:00Z",
+        "text": "Will do. I will update the config reference first."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-006",
+    "channel": "#security",
+    "title": "Move JWT signing from HS256 to RS256",
+    "participants": [
+      "Meera Krishnan",
+      "Aarav Mehta",
+      "Rohan Iyer"
+    ],
+    "started_at": "2024-07-02T10:00:00Z",
+    "last_message_at": "2024-07-02T10:20:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-076",
+    "topics": [
+      "jwt",
+      "rs256",
+      "security",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-006-M01",
+        "author": "Meera Krishnan",
+        "timestamp": "2024-07-02T10:00:00Z",
+        "text": "auth-service signs JWTs with HS256 and the same secret is deployed to four services. If any one leaks, anyone can mint valid tokens."
+      },
+      {
+        "message_id": "CONV-006-M02",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-07-02T10:06:00Z",
+        "text": "Switch to RS256 so the gateway and other services only need the public key?"
+      },
+      {
+        "message_id": "CONV-006-M03",
+        "author": "Meera Krishnan",
+        "timestamp": "2024-07-02T10:10:00Z",
+        "text": "Yes. I also want the access token lifetime cut from 60 minutes to 15, with refresh tokens staying at 7 days."
+      },
+      {
+        "message_id": "CONV-006-M04",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-07-02T10:15:00Z",
+        "text": "Keys in AWS Secrets Manager, rotated every 90 days?"
+      },
+      {
+        "message_id": "CONV-006-M05",
+        "author": "Meera Krishnan",
+        "timestamp": "2024-07-02T10:17:00Z",
+        "text": "Yes."
+      },
+      {
+        "message_id": "CONV-006-M06",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-07-02T10:20:00Z",
+        "text": "Approved. Meera, please raise the ticket (ATL-076)."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-007",
+    "channel": "#backend-design",
+    "title": "PostgreSQL 14 to 16 upgrade",
+    "participants": [
+      "Priya Nair",
+      "Rohan Iyer",
+      "Aarav Mehta"
+    ],
+    "started_at": "2024-09-18T15:00:00Z",
+    "last_message_at": "2024-09-18T15:25:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-098",
+    "topics": [
+      "postgresql",
+      "upgrade",
+      "database",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-007-M01",
+        "author": "Priya Nair",
+        "timestamp": "2024-09-18T15:00:00Z",
+        "text": "Proposal: upgrade RDS from PostgreSQL 14 to 16. On staging our reporting queries ran about 12% faster thanks to improved parallel query, and logical replication is better."
+      },
+      {
+        "message_id": "CONV-007-M02",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-09-18T15:10:00Z",
+        "text": "RDS supports 16 and the upgrade needs a short maintenance window. I can schedule it for a Saturday in October."
+      },
+      {
+        "message_id": "CONV-007-M03",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-09-18T15:15:00Z",
+        "text": "Any application risk?"
+      },
+      {
+        "message_id": "CONV-007-M04",
+        "author": "Priya Nair",
+        "timestamp": "2024-09-18T15:20:00Z",
+        "text": "We tested all services against 16 on staging with no failures."
+      },
+      {
+        "message_id": "CONV-007-M05",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-09-18T15:25:00Z",
+        "text": "Decision: go ahead with the PostgreSQL 16 upgrade in the October window (ATL-098)."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-008",
+    "channel": "#backend",
+    "title": "Stale prices after catalog update",
+    "participants": [
+      "Karthik Rao",
+      "Priya Nair",
+      "Sneha Patil",
+      "Aarav Mehta"
+    ],
+    "started_at": "2024-09-05T11:00:00Z",
+    "last_message_at": "2024-09-05T11:20:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-152",
+    "topics": [
+      "caching",
+      "invalidation",
+      "stale-data",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-008-M01",
+        "author": "Sneha Patil",
+        "timestamp": "2024-09-05T11:00:00Z",
+        "text": "Support tickets: retailers update a price and the storefront still shows the old price for several minutes."
+      },
+      {
+        "message_id": "CONV-008-M02",
+        "author": "Priya Nair",
+        "timestamp": "2024-09-05T11:08:00Z",
+        "text": "That is the cache. Entries only expire by TTL, so a changed product can stay stale up to the TTL."
+      },
+      {
+        "message_id": "CONV-008-M03",
+        "author": "Karthik Rao",
+        "timestamp": "2024-09-05T11:12:00Z",
+        "text": "We already publish catalog.updated to RabbitMQ. The cache could consume it and delete the affected keys."
+      },
+      {
+        "message_id": "CONV-008-M04",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-09-05T11:20:00Z",
+        "text": "Decision: add event-based cache invalidation on catalog.updated. Keep the TTL at 600s as a fallback. Karthik, ticket please (ATL-152)."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-009",
+    "channel": "#backend",
+    "title": "Search index lag after bulk sync",
+    "participants": [
+      "Karthik Rao",
+      "Rohan Iyer"
+    ],
+    "started_at": "2024-10-01T13:00:00Z",
+    "last_message_at": "2024-10-01T13:14:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "search",
+      "opensearch",
+      "indexing"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-009-M01",
+        "author": "Karthik Rao",
+        "timestamp": "2024-10-01T13:00:00Z",
+        "text": "After the nightly bulk sync, search results lag by up to 10 minutes. The full reindex competes with live traffic."
+      },
+      {
+        "message_id": "CONV-009-M02",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-10-01T13:10:00Z",
+        "text": "Could we index incrementally from catalog.updated events and drop the full reindex?"
+      },
+      {
+        "message_id": "CONV-009-M03",
+        "author": "Karthik Rao",
+        "timestamp": "2024-10-01T13:14:00Z",
+        "text": "Yes, and I will lower the bulk batch size from 500 to 200 so refreshes stay light. Raising ATL-133."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-010",
+    "channel": "#incident-review",
+    "title": "August 2024 rolling deploy outage post-mortem",
+    "participants": [
+      "Rohan Iyer",
+      "Vikram Shah",
+      "Aarav Mehta",
+      "Meera Krishnan",
+      "Ananya Das"
+    ],
+    "started_at": "2024-08-28T10:00:00Z",
+    "last_message_at": "2024-08-28T10:25:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-125",
+    "topics": [
+      "incident",
+      "deployment",
+      "blue-green",
+      "postmortem",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-010-M01",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-08-28T10:00:00Z",
+        "text": "Post-mortem for 2024-08-22: order-service returned 5xx for about 12 minutes (14:07 to 14:19 UTC) during a rolling deploy."
+      },
+      {
+        "message_id": "CONV-010-M02",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-08-28T10:03:00Z",
+        "text": "Root cause: a migration renamed a column that old pods still read. During the rolling update old and new pods ran together against the same schema."
+      },
+      {
+        "message_id": "CONV-010-M03",
+        "author": "Meera Krishnan",
+        "timestamp": "2024-08-28T10:10:00Z",
+        "text": "So the migration was not backward compatible and rolling updates exposed it."
+      },
+      {
+        "message_id": "CONV-010-M04",
+        "author": "Ananya Das",
+        "timestamp": "2024-08-28T10:14:00Z",
+        "text": "It also passed review with a single approval and our staging test did not run during a mixed-version rollout."
+      },
+      {
+        "message_id": "CONV-010-M05",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-08-28T10:22:00Z",
+        "text": "Decisions: (1) move production to blue-green deployments, (2) require expand/contract migrations, (3) require 2 approvals on every PR."
+      },
+      {
+        "message_id": "CONV-010-M06",
+        "author": "Vikram Shah",
+        "timestamp": "2024-08-28T10:25:00Z",
+        "text": "Approved. Rohan owns blue-green (ATL-129), I will update the engineering guidelines."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-011",
+    "channel": "#observability",
+    "title": "Alert noise and the p95 latency threshold",
+    "participants": [
+      "Rohan Iyer",
+      "Ananya Das",
+      "Aarav Mehta"
+    ],
+    "started_at": "2024-12-10T09:30:00Z",
+    "last_message_at": "2024-12-10T09:45:00Z",
+    "verified_decision": true,
+    "decision_reference": "ATL-149",
+    "topics": [
+      "alerts",
+      "latency",
+      "p95",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-011-M01",
+        "author": "Rohan Iyer",
+        "timestamp": "2024-12-10T09:30:00Z",
+        "text": "The p95 latency warning at 500ms rarely fires, but support reports slowness well before that."
+      },
+      {
+        "message_id": "CONV-011-M02",
+        "author": "Ananya Das",
+        "timestamp": "2024-12-10T09:38:00Z",
+        "text": "Our normal p95 is around 250ms. Users complain once it passes about 400ms."
+      },
+      {
+        "message_id": "CONV-011-M03",
+        "author": "Aarav Mehta",
+        "timestamp": "2024-12-10T09:45:00Z",
+        "text": "Decision: lower the p95 alert threshold from 500ms to 400ms. Rohan, please raise the ticket (ATL-149)."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  },
+  {
+    "conversation_id": "CONV-012",
+    "channel": "#api",
+    "title": "Rate limit mismatch between spec and gateway",
+    "participants": [
+      "Rohan Iyer",
+      "Vikram Shah",
+      "Aarav Mehta",
+      "Karthik Rao"
+    ],
+    "started_at": "2025-03-05T10:00:00Z",
+    "last_message_at": "2025-03-05T10:18:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "rate-limit",
+      "gateway",
+      "api",
+      "open-question"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-012-M01",
+        "author": "Rohan Iyer",
+        "timestamp": "2025-03-05T10:00:00Z",
+        "text": "The gateway Helm values say 120 requests per minute per key. The API spec says 100. Which one is right?"
+      },
+      {
+        "message_id": "CONV-012-M02",
+        "author": "Vikram Shah",
+        "timestamp": "2025-03-05T10:06:00Z",
+        "text": "We promised partners 100 per minute in the contract."
+      },
+      {
+        "message_id": "CONV-012-M03",
+        "author": "Aarav Mehta",
+        "timestamp": "2025-03-05T10:10:00Z",
+        "text": "I remember raising the gateway to 120 to leave headroom for bursts, but I am not sure that was meant to be the published limit."
+      },
+      {
+        "message_id": "CONV-012-M04",
+        "author": "Karthik Rao",
+        "timestamp": "2025-03-05T10:15:00Z",
+        "text": "I do not remember a decision on this either."
+      },
+      {
+        "message_id": "CONV-012-M05",
+        "author": "Rohan Iyer",
+        "timestamp": "2025-03-05T10:18:00Z",
+        "text": "Nobody is sure. I will open a ticket so we can reconcile it."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-013",
+    "channel": "#random",
+    "title": "Team lunch plans",
+    "participants": [
+      "Vikram Shah",
+      "Sneha Patil",
+      "Karthik Rao"
+    ],
+    "started_at": "2025-01-14T12:00:00Z",
+    "last_message_at": "2025-01-14T12:10:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "social"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-013-M01",
+        "author": "Vikram Shah",
+        "timestamp": "2025-01-14T12:00:00Z",
+        "text": "Team lunch on Friday, vote for the cuisine."
+      },
+      {
+        "message_id": "CONV-013-M02",
+        "author": "Karthik Rao",
+        "timestamp": "2025-01-14T12:04:00Z",
+        "text": "Biryani. Obviously."
+      },
+      {
+        "message_id": "CONV-013-M03",
+        "author": "Sneha Patil",
+        "timestamp": "2025-01-14T12:06:00Z",
+        "text": "I will vote for the new ramen place."
+      },
+      {
+        "message_id": "CONV-013-M04",
+        "author": "Vikram Shah",
+        "timestamp": "2025-01-14T12:10:00Z",
+        "text": "Ramen wins 3 to 2. Booking for 1pm."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-014",
+    "channel": "#backend",
+    "title": "Session TTL and login complaints",
+    "participants": [
+      "Meera Krishnan",
+      "Sneha Patil"
+    ],
+    "started_at": "2024-11-20T16:00:00Z",
+    "last_message_at": "2024-11-20T16:14:00Z",
+    "verified_decision": false,
+    "decision_reference": null,
+    "topics": [
+      "session",
+      "ttl",
+      "security"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-014-M01",
+        "author": "Sneha Patil",
+        "timestamp": "2024-11-20T16:00:00Z",
+        "text": "A few users get logged out of the dashboard after 30 minutes. Could we raise the session TTL to 3600?"
+      },
+      {
+        "message_id": "CONV-014-M02",
+        "author": "Meera Krishnan",
+        "timestamp": "2024-11-20T16:10:00Z",
+        "text": "Security prefers keeping sessions at 30 minutes (1800s). I would rather improve silent refresh in the frontend."
+      },
+      {
+        "message_id": "CONV-014-M03",
+        "author": "Sneha Patil",
+        "timestamp": "2024-11-20T16:14:00Z",
+        "text": "Fine, parking the TTL change and I will look at silent refresh instead."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.4,
+    "authority_basis": "Informal discussion, no ratified decision",
+    "authority_level": "low"
+  },
+  {
+    "conversation_id": "CONV-015",
+    "channel": "#api",
+    "title": "Bulk import endpoint limits",
+    "participants": [
+      "Karthik Rao",
+      "Aarav Mehta"
+    ],
+    "started_at": "2025-02-25T11:00:00Z",
+    "last_message_at": "2025-02-25T11:09:00Z",
+    "verified_decision": true,
+    "decision_reference": null,
+    "topics": [
+      "bulk-import",
+      "api",
+      "limits",
+      "decision"
+    ],
+    "messages": [
+      {
+        "message_id": "CONV-015-M01",
+        "author": "Karthik Rao",
+        "timestamp": "2025-02-25T11:00:00Z",
+        "text": "For POST /v2/products/bulk I tried 1,000 items per request but we hit the 10 second request timeout under load."
+      },
+      {
+        "message_id": "CONV-015-M02",
+        "author": "Aarav Mehta",
+        "timestamp": "2025-02-25T11:06:00Z",
+        "text": "Keep it at 500 items per request. Larger imports should be split by the client."
+      },
+      {
+        "message_id": "CONV-015-M03",
+        "author": "Karthik Rao",
+        "timestamp": "2025-02-25T11:09:00Z",
+        "text": "Okay, 500 it is. I will update the spec."
+      }
+    ],
+    "source_type": "conversation",
+    "authority_score": 0.8,
+    "authority_basis": "Ratified engineering decision",
+    "authority_level": "high"
+  }
+]

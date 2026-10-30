@@ -1,0 +1,32 @@
+---
+doc_id: DOC-009
+title: Observability and Incident Response Guide
+version: "1.1"
+status: draft
+owner: Rohan Iyer
+created_at: 2024-09-25T09:00:00Z
+last_updated: 2024-10-08T15:00:00Z
+authority_score: 0.5
+tags: [observability, alerts, incident]
+---
+
+OBSERVABILITY AND INCIDENT RESPONSE GUIDE (v1.1, DRAFT)
+
+## Tooling
+Metrics are collected with Prometheus and visualised in Grafana. Logs are shipped to a central log store.
+
+## Alert Thresholds
+- API p95 latency above 500 ms for 5 minutes: warning to the engineering channel.
+- Error rate above 2 percent for 3 minutes: page the on-call engineer.
+- Database CPU above 80 percent for 10 minutes: warning.
+
+## Severity Levels
+- SEV1: customer-facing outage.
+- SEV2: major degradation.
+- SEV3: minor issue with a workaround.
+
+## Postmortems
+A written postmortem is required within 5 business days for any SEV1 or SEV2 incident.
+
+## Status
+This guide is a draft pending review by the engineering manager.

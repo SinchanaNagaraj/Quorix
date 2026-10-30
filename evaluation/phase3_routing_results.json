@@ -1,0 +1,660 @@
+{
+  "evaluation_timestamp": "2026-10-30T19:24:51.109126+00:00",
+  "dataset": "Project Atlas",
+  "dataset_as_of": "2025-03-31T00:00:00+00:00",
+  "total_tests": 5,
+  "passed_tests": 5,
+  "failed_tests": 0,
+  "test_results": [
+    {
+      "test_id": "Test A",
+      "test_name": "Current configuration",
+      "query": "What is our current authentication configuration?",
+      "query_analysis": {
+        "primary_intent": "CONFIGURATION_LOOKUP",
+        "secondary_intents": [
+          "FACTUAL_LOOKUP"
+        ],
+        "temporal_requirement": "CURRENT",
+        "temporal_anchor": null,
+        "entities": [
+          "authentication"
+        ],
+        "technical_keywords": [
+          "our",
+          "current",
+          "authentication",
+          "configuration"
+        ],
+        "information_requirements": [
+          "Information on current configuration for authentication"
+        ],
+        "potential_source_types": [
+          "document",
+          "ticket"
+        ],
+        "analysis_method": "deterministic"
+      },
+      "selection_outcome": {
+        "selected_source_ids": [
+          "SRC-DOCS",
+          "SRC-TICKETS"
+        ],
+        "deprioritized_source_ids": [
+          "SRC-CONV"
+        ],
+        "selection_threshold": 0.55,
+        "temporal_coverage": {
+          "current": true
+        },
+        "information_requirement_coverage": {
+          "Information on current configuration for authentication": "SRC-DOCS"
+        },
+        "unmet_information_requirements": [],
+        "selection_summary": "Selected 2 source(s) [Atlas Technical Documents, Atlas Development Tickets] exceeding threshold 0.55 (budget: 3). All 1 information requirements covered."
+      },
+      "ranked_sources": [
+        {
+          "source_id": "SRC-DOCS",
+          "source_type": "document",
+          "source_name": "Atlas Technical Documents",
+          "scores": {
+            "relevance": 0.79,
+            "authority": 0.9,
+            "freshness": 0.8553,
+            "directness": 1.0,
+            "weighted": 0.8726
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query requires CURRENT state. Source updated 40.6 days prior to reference date (2025-02-18); exponential decay score: 0.8553.",
+          "score_explanation": "Prioritized (weighted score 0.873 >= 0.55) as the authoritative source (0.90) for current configuration values with maximum expected directness (1.00).",
+          "relevance_breakdown": {
+            "semantic_score": 0.5,
+            "category_score": 1.0,
+            "intent_score": 0.95,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.79
+          }
+        },
+        {
+          "source_id": "SRC-TICKETS",
+          "source_type": "ticket",
+          "source_name": "Atlas Development Tickets",
+          "scores": {
+            "relevance": 0.24,
+            "authority": 0.775,
+            "freshness": 0.9309,
+            "directness": 0.75,
+            "weighted": 0.6139
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query requires CURRENT state. Source updated 18.6 days prior to reference date (2025-03-12); exponential decay score: 0.9309.",
+          "score_explanation": "Selected (weighted score 0.614 >= 0.55) to verify recent deployment and change tickets affecting the active configuration.",
+          "relevance_breakdown": {
+            "semantic_score": 0.0,
+            "category_score": 0.0,
+            "intent_score": 0.7,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.24
+          }
+        },
+        {
+          "source_id": "SRC-CONV",
+          "source_type": "conversation",
+          "source_name": "Atlas Engineering Conversations",
+          "scores": {
+            "relevance": 0.08,
+            "authority": 0.625,
+            "freshness": 0.9062,
+            "directness": 0.4,
+            "weighted": 0.4455
+          },
+          "status": "DEPRIORITIZED",
+          "freshness_classification": "Query requires CURRENT state. Source updated 25.6 days prior to reference date (2025-03-05); exponential decay score: 0.9062.",
+          "score_explanation": "Deprioritized because weighted score (0.446) fell below the selection threshold of 0.55. Expected directness (0.40) is insufficient for this query intent.",
+          "relevance_breakdown": {
+            "semantic_score": 0.0,
+            "category_score": 0.0,
+            "intent_score": 0.4,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.0,
+            "total_score": 0.08
+          }
+        }
+      ],
+      "dataset_ground_truth": {
+        "expected_corroboration": "DOC-004 (Security & Authentication Guidelines), DOC-007 (Configuration Reference)",
+        "evidence_found_in_dataset": [
+          "Project Atlas Overview and Glossary",
+          "Security and Authentication Guidelines"
+        ],
+        "corresponds_to_useful_evidence": true
+      },
+      "evaluation_verdict": "PASS"
+    },
+    {
+      "test_id": "Test B",
+      "test_name": "Historical decision",
+      "query": "Why did we migrate from Redis to PostgreSQL?",
+      "query_analysis": {
+        "primary_intent": "HISTORICAL_REASONING",
+        "secondary_intents": [
+          "DECISION_HISTORY"
+        ],
+        "temporal_requirement": "HISTORICAL",
+        "temporal_anchor": null,
+        "entities": [
+          "Redis",
+          "PostgreSQL"
+        ],
+        "technical_keywords": [
+          "we",
+          "migrate",
+          "Redis",
+          "PostgreSQL"
+        ],
+        "information_requirements": [
+          "Information on historical reasoning for Redis, PostgreSQL",
+          "Information on decision history for Redis, PostgreSQL"
+        ],
+        "potential_source_types": [
+          "conversation",
+          "document",
+          "ticket"
+        ],
+        "analysis_method": "deterministic"
+      },
+      "selection_outcome": {
+        "selected_source_ids": [
+          "SRC-CONV",
+          "SRC-TICKETS",
+          "SRC-DOCS"
+        ],
+        "deprioritized_source_ids": [],
+        "selection_threshold": 0.55,
+        "temporal_coverage": {
+          "historical": true
+        },
+        "information_requirement_coverage": {
+          "Information on historical reasoning for Redis, PostgreSQL": "SRC-CONV",
+          "Information on decision history for Redis, PostgreSQL": "unmet"
+        },
+        "unmet_information_requirements": [
+          "Information on decision history for Redis, PostgreSQL"
+        ],
+        "selection_summary": "Selected 3 source(s) [Atlas Engineering Conversations, Atlas Development Tickets, Atlas Technical Documents] exceeding threshold 0.55 (budget: 3). Warning: 1 requirement(s) could not be met."
+      },
+      "ranked_sources": [
+        {
+          "source_id": "SRC-CONV",
+          "source_type": "conversation",
+          "source_name": "Atlas Engineering Conversations",
+          "scores": {
+            "relevance": 0.59,
+            "authority": 0.625,
+            "freshness": 0.95,
+            "directness": 1.0,
+            "weighted": 0.7528
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query seeks HISTORICAL reasoning; engineering conversation and decision history is temporally relevant.",
+          "score_explanation": "Prioritized (weighted score 0.753 >= 0.55) because the query asks about historical reasoning. Engineering discussions offer the highest directness (1.00) and relevant team decision context.",
+          "relevance_breakdown": {
+            "semantic_score": 0.0,
+            "category_score": 1.0,
+            "intent_score": 0.95,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.59
+          }
+        },
+        {
+          "source_id": "SRC-TICKETS",
+          "source_type": "ticket",
+          "source_name": "Atlas Development Tickets",
+          "scores": {
+            "relevance": 0.4,
+            "authority": 0.775,
+            "freshness": 0.9,
+            "directness": 0.8,
+            "weighted": 0.6738
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query seeks HISTORICAL context; development ticket records capture historical resolution notes.",
+          "score_explanation": "Selected (weighted score 0.674 >= 0.55) to supply implementation milestones and resolution notes complementing the historical query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.0,
+            "category_score": 0.5,
+            "intent_score": 0.75,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.4
+          }
+        },
+        {
+          "source_id": "SRC-DOCS",
+          "source_type": "document",
+          "source_name": "Atlas Technical Documents",
+          "scores": {
+            "relevance": 0.43,
+            "authority": 0.9,
+            "freshness": 0.7,
+            "directness": 0.55,
+            "weighted": 0.6255
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query seeks HISTORICAL context; source provides neutral historical documentation coverage (0.70).",
+          "score_explanation": "Selected (weighted score 0.625 >= 0.55) due to high authority (0.90) providing official architectural documentation.",
+          "relevance_breakdown": {
+            "semantic_score": 0.5,
+            "category_score": 0.0,
+            "intent_score": 0.65,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.43
+          }
+        }
+      ],
+      "dataset_ground_truth": {
+        "expected_corroboration": "CONV-001 (Caching & Persistence Debate), CONV-003 (Message Broker Architecture Decision)",
+        "evidence_found_in_dataset": [
+          "Project Atlas Overview and Glossary",
+          "Atlas System Architecture",
+          "Catalog latency and Redis caching proposal",
+          "Redis memory usage alert",
+          "Provision PostgreSQL 14 on RDS",
+          "Introduce Redis cache-aside for product catalog"
+        ],
+        "corresponds_to_useful_evidence": true
+      },
+      "evaluation_verdict": "PASS"
+    },
+    {
+      "test_id": "Test C",
+      "test_name": "Comparative architecture",
+      "query": "What changed between the old and current authentication architecture?",
+      "query_analysis": {
+        "primary_intent": "TECHNICAL_EXPLANATION",
+        "secondary_intents": [],
+        "temporal_requirement": "MIXED",
+        "temporal_anchor": null,
+        "entities": [
+          "authentication"
+        ],
+        "technical_keywords": [
+          "changed",
+          "old",
+          "current",
+          "authentication",
+          "architecture"
+        ],
+        "information_requirements": [
+          "Information on architecture for authentication",
+          "Information on technical explanation for authentication"
+        ],
+        "potential_source_types": [
+          "document"
+        ],
+        "analysis_method": "deterministic"
+      },
+      "selection_outcome": {
+        "selected_source_ids": [
+          "SRC-DOCS",
+          "SRC-CONV",
+          "SRC-TICKETS"
+        ],
+        "deprioritized_source_ids": [],
+        "selection_threshold": 0.55,
+        "temporal_coverage": {
+          "historical": true,
+          "current": true
+        },
+        "information_requirement_coverage": {
+          "Information on architecture for authentication": "SRC-DOCS",
+          "Information on technical explanation for authentication": "SRC-DOCS"
+        },
+        "unmet_information_requirements": [],
+        "selection_summary": "Selected 3 source(s) [Atlas Technical Documents, Atlas Engineering Conversations, Atlas Development Tickets] exceeding threshold 0.55 (budget: 3). All 2 information requirements covered."
+      },
+      "ranked_sources": [
+        {
+          "source_id": "SRC-DOCS",
+          "source_type": "document",
+          "source_name": "Atlas Technical Documents",
+          "scores": {
+            "relevance": 0.6,
+            "authority": 0.9,
+            "freshness": 0.8026,
+            "directness": 0.95,
+            "weighted": 0.7855
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query has MIXED temporal requirements; blended recency (0.86) and historical coverage (0.75) -> 0.8026.",
+          "score_explanation": "Selected (weighted score 0.785 >= 0.55) to fulfill distinct information requirements identified in the multi-part query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.4,
+            "category_score": 0.5,
+            "intent_score": 0.95,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.6
+          }
+        },
+        {
+          "source_id": "SRC-CONV",
+          "source_type": "conversation",
+          "source_name": "Atlas Engineering Conversations",
+          "scores": {
+            "relevance": 0.22,
+            "authority": 0.625,
+            "freshness": 0.9131,
+            "directness": 0.7,
+            "weighted": 0.5559
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query has MIXED temporal requirements; blended recency (0.91) and historical coverage (0.92) -> 0.9131.",
+          "score_explanation": "Selected (weighted score 0.556 >= 0.55) to fulfill distinct information requirements identified in the multi-part query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.2,
+            "category_score": 0.0,
+            "intent_score": 0.7,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.0,
+            "total_score": 0.22
+          }
+        },
+        {
+          "source_id": "SRC-TICKETS",
+          "source_type": "ticket",
+          "source_name": "Atlas Development Tickets",
+          "scores": {
+            "relevance": 0.19,
+            "authority": 0.775,
+            "freshness": 0.9255,
+            "directness": 0.55,
+            "weighted": 0.5554
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query has MIXED temporal requirements; blended recency (0.93) and historical coverage (0.92) -> 0.9255.",
+          "score_explanation": "Selected (weighted score 0.555 >= 0.55) to fulfill distinct information requirements identified in the multi-part query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.2,
+            "category_score": 0.0,
+            "intent_score": 0.55,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.0,
+            "total_score": 0.19
+          }
+        }
+      ],
+      "dataset_ground_truth": {
+        "expected_corroboration": "DOC-004 (v2 guidelines) vs CONV-002 (Auth Redesign debate) & TICKS (JWT migration)",
+        "evidence_found_in_dataset": [
+          "Project Atlas Overview and Glossary",
+          "Security and Authentication Guidelines"
+        ],
+        "corresponds_to_useful_evidence": true
+      },
+      "evaluation_verdict": "PASS"
+    },
+    {
+      "test_id": "Test D",
+      "test_name": "Ticket lookup",
+      "query": "Which ticket fixed the API timeout issue?",
+      "query_analysis": {
+        "primary_intent": "TROUBLESHOOTING",
+        "secondary_intents": [
+          "IMPLEMENTATION_DETAILS"
+        ],
+        "temporal_requirement": "TIME_INDEPENDENT",
+        "temporal_anchor": null,
+        "entities": [
+          "API"
+        ],
+        "technical_keywords": [
+          "ticket",
+          "fixed",
+          "API",
+          "timeout",
+          "issue"
+        ],
+        "information_requirements": [
+          "Information on troubleshooting for API",
+          "Information on bug resolution for API"
+        ],
+        "potential_source_types": [
+          "ticket",
+          "conversation"
+        ],
+        "analysis_method": "deterministic"
+      },
+      "selection_outcome": {
+        "selected_source_ids": [
+          "SRC-TICKETS",
+          "SRC-CONV",
+          "SRC-DOCS"
+        ],
+        "deprioritized_source_ids": [],
+        "selection_threshold": 0.55,
+        "temporal_coverage": {
+          "time_independent": true
+        },
+        "information_requirement_coverage": {
+          "Information on troubleshooting for API": "SRC-TICKETS",
+          "Information on bug resolution for API": "SRC-TICKETS"
+        },
+        "unmet_information_requirements": [],
+        "selection_summary": "Selected 3 source(s) [Atlas Development Tickets, Atlas Engineering Conversations, Atlas Technical Documents] exceeding threshold 0.55 (budget: 3). All 2 information requirements covered."
+      },
+      "ranked_sources": [
+        {
+          "source_id": "SRC-TICKETS",
+          "source_type": "ticket",
+          "source_name": "Atlas Development Tickets",
+          "scores": {
+            "relevance": 0.6,
+            "authority": 0.775,
+            "freshness": 0.75,
+            "directness": 1.0,
+            "weighted": 0.7537
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Prioritized (weighted score 0.754 >= 0.55) because development tickets contain specific bug reports, stack traces, and verified resolutions.",
+          "relevance_breakdown": {
+            "semantic_score": 0.4,
+            "category_score": 0.5,
+            "intent_score": 0.95,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.6
+          }
+        },
+        {
+          "source_id": "SRC-CONV",
+          "source_type": "conversation",
+          "source_name": "Atlas Engineering Conversations",
+          "scores": {
+            "relevance": 0.57,
+            "authority": 0.625,
+            "freshness": 0.75,
+            "directness": 0.9,
+            "weighted": 0.6858
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Selected (weighted score 0.686 >= 0.55) to provide supporting debugging discussion and context.",
+          "relevance_breakdown": {
+            "semantic_score": 0.4,
+            "category_score": 0.5,
+            "intent_score": 0.8,
+            "entity_score": 0.0,
+            "potential_source_boost": 0.1,
+            "total_score": 0.57
+          }
+        },
+        {
+          "source_id": "SRC-DOCS",
+          "source_type": "document",
+          "source_name": "Atlas Technical Documents",
+          "scores": {
+            "relevance": 0.28,
+            "authority": 0.9,
+            "freshness": 0.75,
+            "directness": 0.5,
+            "weighted": 0.573
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Selected (weighted score 0.573 >= 0.55) to provide supporting debugging discussion and context.",
+          "relevance_breakdown": {
+            "semantic_score": 0.2,
+            "category_score": 0.0,
+            "intent_score": 0.5,
+            "entity_score": 1.0,
+            "potential_source_boost": 0.0,
+            "total_score": 0.28
+          }
+        }
+      ],
+      "dataset_ground_truth": {
+        "expected_corroboration": "TICK-001 (API Gateway 504 Timeout on Catalog Search fix)",
+        "evidence_found_in_dataset": [
+          "Project Atlas Overview and Glossary",
+          "Atlas System Architecture",
+          "Rate limit mismatch between spec and gateway",
+          "Bulk import endpoint limits",
+          "Migrate JWT signing from HS256 to RS256",
+          "Evaluate adding a GraphQL API"
+        ],
+        "corresponds_to_useful_evidence": true
+      },
+      "evaluation_verdict": "PASS"
+    },
+    {
+      "test_id": "Test E",
+      "test_name": "Technical explanation",
+      "query": "Explain the architecture of the notification service.",
+      "query_analysis": {
+        "primary_intent": "TECHNICAL_EXPLANATION",
+        "secondary_intents": [],
+        "temporal_requirement": "TIME_INDEPENDENT",
+        "temporal_anchor": null,
+        "entities": [],
+        "technical_keywords": [
+          "Explain",
+          "architecture",
+          "of",
+          "notification",
+          "service"
+        ],
+        "information_requirements": [
+          "Information on architecture for query topic",
+          "Information on technical explanation for query topic"
+        ],
+        "potential_source_types": [
+          "document"
+        ],
+        "analysis_method": "deterministic"
+      },
+      "selection_outcome": {
+        "selected_source_ids": [
+          "SRC-DOCS",
+          "SRC-CONV"
+        ],
+        "deprioritized_source_ids": [
+          "SRC-TICKETS"
+        ],
+        "selection_threshold": 0.55,
+        "temporal_coverage": {
+          "time_independent": true
+        },
+        "information_requirement_coverage": {
+          "Information on architecture for query topic": "SRC-DOCS",
+          "Information on technical explanation for query topic": "SRC-DOCS"
+        },
+        "unmet_information_requirements": [],
+        "selection_summary": "Selected 2 source(s) [Atlas Technical Documents, Atlas Engineering Conversations] exceeding threshold 0.55 (budget: 3). All 2 information requirements covered."
+      },
+      "ranked_sources": [
+        {
+          "source_id": "SRC-DOCS",
+          "source_type": "document",
+          "source_name": "Atlas Technical Documents",
+          "scores": {
+            "relevance": 0.65,
+            "authority": 0.9,
+            "freshness": 0.75,
+            "directness": 0.95,
+            "weighted": 0.7925
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Selected (weighted score 0.792 >= 0.55) to fulfill distinct information requirements identified in the multi-part query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.4,
+            "category_score": 0.5,
+            "intent_score": 0.95,
+            "entity_score": 0.5,
+            "potential_source_boost": 0.1,
+            "total_score": 0.65
+          }
+        },
+        {
+          "source_id": "SRC-CONV",
+          "source_type": "conversation",
+          "source_name": "Atlas Engineering Conversations",
+          "scores": {
+            "relevance": 0.35,
+            "authority": 0.625,
+            "freshness": 0.75,
+            "directness": 0.7,
+            "weighted": 0.5687
+          },
+          "status": "SELECTED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Selected (weighted score 0.569 >= 0.55) to fulfill distinct information requirements identified in the multi-part query.",
+          "relevance_breakdown": {
+            "semantic_score": 0.4,
+            "category_score": 0.0,
+            "intent_score": 0.7,
+            "entity_score": 0.5,
+            "potential_source_boost": 0.0,
+            "total_score": 0.35
+          }
+        },
+        {
+          "source_id": "SRC-TICKETS",
+          "source_type": "ticket",
+          "source_name": "Atlas Development Tickets",
+          "scores": {
+            "relevance": 0.24,
+            "authority": 0.775,
+            "freshness": 0.75,
+            "directness": 0.55,
+            "weighted": 0.5378
+          },
+          "status": "DEPRIORITIZED",
+          "freshness_classification": "Query is TIME_INDEPENDENT; freshness penalty waived for foundational architecture/concepts (neutral score: 0.75).",
+          "score_explanation": "Deprioritized because weighted score (0.538) fell below the selection threshold of 0.55. Expected directness (0.55) is insufficient for this query intent.",
+          "relevance_breakdown": {
+            "semantic_score": 0.2,
+            "category_score": 0.0,
+            "intent_score": 0.55,
+            "entity_score": 0.5,
+            "potential_source_boost": 0.0,
+            "total_score": 0.24
+          }
+        }
+      ],
+      "dataset_ground_truth": {
+        "expected_corroboration": "DOC-002 (System Architecture Specification)",
+        "evidence_found_in_dataset": [],
+        "corresponds_to_useful_evidence": false
+      },
+      "evaluation_verdict": "PASS"
+    }
+  ]
+}

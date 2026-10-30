@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     app_name: str = "Quorix"
     app_env: str = "development"
     debug: bool = False
-    api_prefix: str = "/api"
+    api_prefix: str = "/api/v1"
     cors_origins: str = "http://localhost:5173"
     database_url: SecretStr | None = None
     qdrant_url: str | None = None
@@ -38,6 +38,16 @@ class Settings(BaseSettings):
     chunk_overlap: int = 80  # characters
     data_dir: Path = REPO_ROOT / "data"
     max_document_bytes: int = 10 * 1024 * 1024
+
+    # Phase 3: Query Analysis & Source Selection
+    weight_relevance: float = 0.35
+    weight_authority: float = 0.25
+    weight_freshness: float = 0.20
+    weight_directness: float = 0.20
+    selection_threshold: float = 0.55
+    max_selected_sources: int = 3
+    dataset_as_of: str = "2025-03-31T00:00:00Z"
+    freshness_half_life_days: float = 180.0
 
     def require_database_url(self) -> str:
         if self.database_url is None:

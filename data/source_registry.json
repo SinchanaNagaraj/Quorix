@@ -1,0 +1,94 @@
+{
+  "as_of": "2025-03-31T00:00:00Z",
+  "sources": [
+    {
+      "source_id": "SRC-DOCS",
+      "source_type": "document",
+      "name": "Atlas Technical Documents",
+      "description": "Approved and draft technical documentation: architecture, caching, security, API specification, engineering guidelines, configuration reference, deployment runbook, observability guide, database guide.",
+      "authority_metadata": {
+        "base_authority": 0.85,
+        "basis": "Owned, versioned documents; approved vs draft status",
+        "per_record_field": "authority_score"
+      },
+      "freshness_metadata": {
+        "last_updated": "2025-02-18T09:45:00Z",
+        "record_count": 10,
+        "timestamp_field": "last_updated"
+      },
+      "content_categories": [
+        "configuration values",
+        "architecture",
+        "api contract",
+        "security policy",
+        "engineering process",
+        "runbooks"
+      ],
+      "best_for": [
+        "current configuration lookup",
+        "how something is designed",
+        "policy and process"
+      ],
+      "retrieval_interface": "DocumentAdapter.search(query, top_k, filters)",
+      "data_file": "data/documents.json"
+    },
+    {
+      "source_id": "SRC-CONV",
+      "source_type": "conversation",
+      "name": "Atlas Engineering Conversations",
+      "description": "Engineering channel discussions: design proposals, decision debates, incident post-mortems, debugging threads, and casual chatter.",
+      "authority_metadata": {
+        "base_authority": 0.55,
+        "basis": "Context-dependent; ratified decisions are high authority, informal talk is low",
+        "per_record_field": "authority_score"
+      },
+      "freshness_metadata": {
+        "last_updated": "2025-03-05T10:18:00Z",
+        "record_count": 15,
+        "timestamp_field": "last_message_at"
+      },
+      "content_categories": [
+        "decision rationale",
+        "historical design reasoning",
+        "debugging discussion",
+        "open questions"
+      ],
+      "best_for": [
+        "why was X decided",
+        "historical context",
+        "team reasoning"
+      ],
+      "retrieval_interface": "ConversationAdapter.search(query, top_k, filters)",
+      "data_file": "data/conversations.json"
+    },
+    {
+      "source_id": "SRC-TICKETS",
+      "source_type": "ticket",
+      "name": "Atlas Development Tickets",
+      "description": "Bug reports, features, tasks, incidents and improvements with status, timestamps, implementation details and resolution notes.",
+      "authority_metadata": {
+        "base_authority": 0.7,
+        "basis": "Depends on status and resolution notes",
+        "per_record_field": "authority_score"
+      },
+      "freshness_metadata": {
+        "last_updated": "2025-03-12T10:00:00Z",
+        "record_count": 15,
+        "timestamp_field": "updated_at"
+      },
+      "content_categories": [
+        "what changed and when",
+        "bug history",
+        "implementation status",
+        "incident records"
+      ],
+      "best_for": [
+        "when/what was changed",
+        "status of work",
+        "bug and fix history"
+      ],
+      "retrieval_interface": "TicketAdapter.search(query, top_k, filters)",
+      "data_file": "data/tickets.json"
+    }
+  ]
+}

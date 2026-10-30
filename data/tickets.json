@@ -1,0 +1,378 @@
+[
+  {
+    "ticket_id": "ATL-021",
+    "type": "task",
+    "title": "Provision PostgreSQL 14 on RDS",
+    "status": "done",
+    "priority": "medium",
+    "reporter": "Aarav Mehta",
+    "assignee": "Rohan Iyer",
+    "created_at": "2024-01-22T09:00:00Z",
+    "updated_at": "2024-01-30T17:00:00Z",
+    "resolved_at": "2024-01-30T17:00:00Z",
+    "components": [
+      "database",
+      "infrastructure"
+    ],
+    "description": "Provision the primary PostgreSQL database for Atlas on Amazon RDS using PostgreSQL 14 with one read replica (db.r6g.large).",
+    "resolution_notes": "Provisioned PostgreSQL 14 primary and replica in the production VPC. Backups enabled.",
+    "linked_records": [],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-045",
+    "type": "feature",
+    "title": "Introduce Redis cache-aside for product catalog",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Aarav Mehta",
+    "assignee": "Priya Nair",
+    "created_at": "2024-03-05T09:00:00Z",
+    "updated_at": "2024-03-18T16:00:00Z",
+    "resolved_at": "2024-03-18T16:00:00Z",
+    "components": [
+      "catalog-service",
+      "cache"
+    ],
+    "description": "Catalog reads have p95 of 850ms and Postgres CPU at 85% under load. Introduce a Redis (ElastiCache 7.0) cache-aside layer for catalog product reads. Initial TTL 300 seconds. Target hit ratio 80%.",
+    "resolution_notes": "Implemented and deployed on 2024-03-18. p95 for GET /v2/products dropped from 850ms to about 210ms. Initial hit ratio 62%.",
+    "linked_records": [
+      "CONV-001"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-076",
+    "type": "task",
+    "title": "Migrate JWT signing from HS256 to RS256",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Meera Krishnan",
+    "assignee": "Meera Krishnan",
+    "created_at": "2024-07-03T09:00:00Z",
+    "updated_at": "2024-07-30T15:00:00Z",
+    "resolved_at": "2024-07-30T15:00:00Z",
+    "components": [
+      "auth-service",
+      "api-gateway",
+      "security"
+    ],
+    "description": "Replace HS256 shared-secret signing with RS256 asymmetric signing. Reduce access token lifetime from 60 minutes to 15 minutes. Refresh tokens stay at 7 days.",
+    "resolution_notes": "Completed. Private key lives only in auth-service. Gateway verifies with public key. Keys stored in AWS Secrets Manager with 90 day rotation.",
+    "linked_records": [
+      "CONV-006"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-098",
+    "type": "task",
+    "title": "Upgrade PostgreSQL from 14 to 16",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Priya Nair",
+    "assignee": "Rohan Iyer",
+    "created_at": "2024-09-20T09:00:00Z",
+    "updated_at": "2024-10-25T11:00:00Z",
+    "resolved_at": "2024-10-25T11:00:00Z",
+    "components": [
+      "database",
+      "infrastructure"
+    ],
+    "description": "Upgrade the Atlas RDS instance from PostgreSQL 14 to PostgreSQL 16 during a Saturday maintenance window.",
+    "resolution_notes": "Upgrade performed on 2024-10-19 with 18 minutes of planned downtime. All services validated against 16. Reporting queries about 12% faster.",
+    "linked_records": [
+      "CONV-007",
+      "DOC-010"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-103",
+    "type": "feature",
+    "title": "Evaluate adding a GraphQL API",
+    "status": "wont_do",
+    "priority": "low",
+    "reporter": "Sneha Patil",
+    "assignee": "Aarav Mehta",
+    "created_at": "2024-07-08T09:00:00Z",
+    "updated_at": "2024-07-15T10:00:00Z",
+    "resolved_at": "2024-07-15T10:00:00Z",
+    "components": [
+      "api"
+    ],
+    "description": "Frontend team asks whether Atlas should expose a GraphQL endpoint in addition to REST.",
+    "resolution_notes": "Closed as won't do. Atlas v2 stays REST only. Revisit after general availability if partners request it.",
+    "linked_records": [
+      "DOC-005"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.6,
+    "authority_basis": "Ticket status 'wont_do' with resolution notes",
+    "authority_level": "medium"
+  },
+  {
+    "ticket_id": "ATL-110",
+    "type": "bug",
+    "title": "Connection pool exhaustion at peak load",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Ananya Das",
+    "assignee": "Priya Nair",
+    "created_at": "2024-07-25T09:00:00Z",
+    "updated_at": "2024-08-02T14:00:00Z",
+    "resolved_at": "2024-08-02T14:00:00Z",
+    "components": [
+      "catalog-service",
+      "order-service",
+      "database"
+    ],
+    "description": "During load tests, services fail with pool timeout errors. DB_POOL_MAX is set to 20 per service instance.",
+    "resolution_notes": "Raised DB_POOL_MAX from 20 to 40 per instance and set DB_POOL_TIMEOUT_SECONDS to 30. Load test passes.",
+    "linked_records": [],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-120",
+    "type": "bug",
+    "title": "Refresh token replay possible after rotation",
+    "status": "done",
+    "priority": "critical",
+    "reporter": "Meera Krishnan",
+    "assignee": "Meera Krishnan",
+    "created_at": "2024-08-12T09:00:00Z",
+    "updated_at": "2024-08-20T18:00:00Z",
+    "resolved_at": "2024-08-20T18:00:00Z",
+    "components": [
+      "auth-service",
+      "security"
+    ],
+    "description": "A previously used refresh token could be replayed and still produced a valid access token.",
+    "resolution_notes": "Added refresh token rotation with reuse detection. Presenting a used token now revokes the whole token family.",
+    "linked_records": [
+      "DOC-004"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-125",
+    "type": "incident",
+    "title": "Order service 5xx during rolling deploy on 2024-08-22",
+    "status": "done",
+    "priority": "critical",
+    "reporter": "Rohan Iyer",
+    "assignee": "Rohan Iyer",
+    "created_at": "2024-08-22T14:30:00Z",
+    "updated_at": "2024-08-27T12:00:00Z",
+    "resolved_at": "2024-08-27T12:00:00Z",
+    "components": [
+      "order-service",
+      "deployment",
+      "database"
+    ],
+    "description": "order-service returned 5xx errors from 14:07 to 14:19 UTC while a rolling update was in progress.",
+    "resolution_notes": "Root cause: a migration renamed a column still read by old pods running during the rolling update. Fix: rollback of the migration. Follow-ups: blue-green deployments (ATL-129), expand/contract migration rule, 2 PR approvals.",
+    "linked_records": [
+      "CONV-010"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-129",
+    "type": "task",
+    "title": "Implement blue-green deployments",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Rohan Iyer",
+    "assignee": "Rohan Iyer",
+    "created_at": "2024-09-02T09:00:00Z",
+    "updated_at": "2024-09-14T17:00:00Z",
+    "resolved_at": "2024-09-14T17:00:00Z",
+    "components": [
+      "deployment",
+      "infrastructure"
+    ],
+    "description": "Implement blue-green deployments for api-gateway and order-service, then extend to the remaining services, to avoid mixed-version rollouts.",
+    "resolution_notes": "Blue-green is live for all services. Traffic switching is done at the load balancer and rollback is a traffic switch back.",
+    "linked_records": [
+      "CONV-010",
+      "DOC-008"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-133",
+    "type": "bug",
+    "title": "Search index lag after bulk catalog sync",
+    "status": "done",
+    "priority": "medium",
+    "reporter": "Karthik Rao",
+    "assignee": "Karthik Rao",
+    "created_at": "2024-09-28T09:00:00Z",
+    "updated_at": "2024-10-08T16:00:00Z",
+    "resolved_at": "2024-10-08T16:00:00Z",
+    "components": [
+      "search-service"
+    ],
+    "description": "After the nightly bulk sync, OpenSearch results lag by up to 10 minutes.",
+    "resolution_notes": "Switched to incremental indexing from catalog.updated events and reduced SEARCH_BULK_BATCH from 500 to 200. Lag is now under 30 seconds.",
+    "linked_records": [
+      "CONV-009"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-141",
+    "type": "improvement",
+    "title": "Increase catalog cache TTL from 300s to 600s",
+    "status": "done",
+    "priority": "medium",
+    "reporter": "Priya Nair",
+    "assignee": "Priya Nair",
+    "created_at": "2024-06-13T09:00:00Z",
+    "updated_at": "2024-06-20T16:00:00Z",
+    "resolved_at": "2024-06-20T16:00:00Z",
+    "components": [
+      "catalog-service",
+      "cache"
+    ],
+    "description": "Cache hit ratio is 62% against a target of 85%. Raise CATALOG_CACHE_TTL_SECONDS from 300 to 600 as agreed in the team discussion.",
+    "resolution_notes": "Deployed on 2024-06-20. Hit ratio rose from 62% to 88%. Note: DOC-003 was not updated and still lists 300s.",
+    "linked_records": [
+      "CONV-005",
+      "DOC-003"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-149",
+    "type": "task",
+    "title": "Lower p95 latency alert threshold from 500ms to 400ms",
+    "status": "done",
+    "priority": "low",
+    "reporter": "Rohan Iyer",
+    "assignee": "Rohan Iyer",
+    "created_at": "2024-12-11T09:00:00Z",
+    "updated_at": "2024-12-18T12:00:00Z",
+    "resolved_at": "2024-12-18T12:00:00Z",
+    "components": [
+      "observability"
+    ],
+    "description": "Update the Prometheus alert rule for API p95 latency so it fires above 400ms for 5 minutes instead of 500ms.",
+    "resolution_notes": "Alert rule updated in production on 2024-12-18. DOC-009 draft not yet revised.",
+    "linked_records": [
+      "CONV-011",
+      "DOC-009"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-152",
+    "type": "bug",
+    "title": "Stale prices after catalog update",
+    "status": "done",
+    "priority": "high",
+    "reporter": "Sneha Patil",
+    "assignee": "Karthik Rao",
+    "created_at": "2024-09-06T09:00:00Z",
+    "updated_at": "2024-09-27T15:00:00Z",
+    "resolved_at": "2024-09-27T15:00:00Z",
+    "components": [
+      "catalog-service",
+      "cache"
+    ],
+    "description": "Retailers see old prices for several minutes after updating a product because cache entries only expire by TTL.",
+    "resolution_notes": "Implemented event-based invalidation: catalog-service consumes catalog.updated and deletes affected Redis keys. TTL (600s) remains as a fallback.",
+    "linked_records": [
+      "CONV-008"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.75,
+    "authority_basis": "Ticket status 'done' with resolution notes",
+    "authority_level": "high"
+  },
+  {
+    "ticket_id": "ATL-158",
+    "type": "feature",
+    "title": "Add per-endpoint rate limits",
+    "status": "in_progress",
+    "priority": "medium",
+    "reporter": "Aarav Mehta",
+    "assignee": "Karthik Rao",
+    "created_at": "2025-02-10T09:00:00Z",
+    "updated_at": "2025-03-12T10:00:00Z",
+    "resolved_at": null,
+    "components": [
+      "api-gateway"
+    ],
+    "description": "Proposal to add separate rate limits per endpoint, for example a lower limit for the bulk import endpoint. Design under review and not yet in production.",
+    "resolution_notes": null,
+    "linked_records": [
+      "DOC-005"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.5,
+    "authority_basis": "Ticket status 'in_progress'",
+    "authority_level": "medium"
+  },
+  {
+    "ticket_id": "ATL-166",
+    "type": "bug",
+    "title": "Reconcile rate limit mismatch between API spec and gateway",
+    "status": "open",
+    "priority": "high",
+    "reporter": "Rohan Iyer",
+    "assignee": "Vikram Shah",
+    "created_at": "2025-03-06T09:00:00Z",
+    "updated_at": "2025-03-06T09:00:00Z",
+    "resolved_at": null,
+    "components": [
+      "api-gateway",
+      "documentation"
+    ],
+    "description": "API spec (v2.3) states 100 requests per minute per key while gateway configuration states 120. Determine the intended limit and align the spec, the config reference and the gateway.",
+    "resolution_notes": null,
+    "linked_records": [
+      "CONV-012",
+      "DOC-005",
+      "DOC-007"
+    ],
+    "source_type": "ticket",
+    "authority_score": 0.45,
+    "authority_basis": "Ticket status 'open'",
+    "authority_level": "low"
+  }
+]

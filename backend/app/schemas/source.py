@@ -102,6 +102,18 @@ class ConversationMessage(BaseModel):
 
     _utc = field_validator("timestamp")(lambda v: to_utc(v))
 
+    @model_validator(mode="before")
+    @classmethod
+    def _remap(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            d = dict(data)
+            if "speaker" not in d and "author" in d:
+                d["speaker"] = d["author"]
+            if "content" not in d and "text" in d:
+                d["content"] = d["text"]
+            return d
+        return data
+
     @field_validator("content")
     @classmethod
     def _content(cls, v: str) -> str:
@@ -124,6 +136,23 @@ class ConversationInput(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     _utc = field_validator("created_at", "updated_at")(lambda v: to_utc(v))
+
+    @model_validator(mode="before")
+    @classmethod
+    def _remap(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            d = dict(data)
+            auth = d.get("authority_level")
+            if isinstance(auth, str):
+                if "authority_score" in d and isinstance(d["authority_score"], (int, float)):
+                    d["authority_level"] = float(d["authority_score"])
+                else:
+                    d.setdefault("metadata", {})["raw_authority_level"] = auth
+                    d["authority_level"] = None
+            elif auth is None and "authority_score" in d and isinstance(d["authority_score"], (int, float)):
+                d["authority_level"] = float(d["authority_score"])
+            return d
+        return data
 
 
 # ----- Ticket input -------------------------------------------------------
@@ -161,6 +190,27 @@ class TicketInput(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
     _utc = field_validator("created_at", "updated_at", "resolved_at")(lambda v: to_utc(v))
+
+    @model_validator(mode="before")
+    @classmethod
+    def _remap(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            d = dict(data)
+            if "resolution" not in d and "resolution_notes" in d:
+                d["resolution"] = d["resolution_notes"]
+            if "labels" not in d and "components" in d:
+                d["labels"] = d["components"]
+            auth = d.get("authority_level")
+            if isinstance(auth, str):
+                if "authority_score" in d and isinstance(d["authority_score"], (int, float)):
+                    d["authority_level"] = float(d["authority_score"])
+                else:
+                    d.setdefault("metadata", {})["raw_authority_level"] = auth
+                    d["authority_level"] = None
+            elif auth is None and "authority_score" in d and isinstance(d["authority_score"], (int, float)):
+                d["authority_level"] = float(d["authority_score"])
+            return d
+        return data
 
     @field_validator("status")
     @classmethod
